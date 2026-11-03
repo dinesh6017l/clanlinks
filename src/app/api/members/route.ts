@@ -1,11 +1,27 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-export async function GET() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return NextResponse.json({ members: [] });
-  const db = createClient(url, key);
-  const { data, error } = await db.from("member_post_counts").select("name,post_count,last_active").order("post_count", { ascending: false });
-  if (error) return NextResponse.json({ members: [] });
-  return NextResponse.json({ members: data });
+import { NextRequest, NextResponse } from "next/server";
+import { boardRole } from "@/lib/board-auth";
+import { cleanText } from "@/lib/detect-link";
+
+export async function GET(req: NextRequest) {
+  const q = new URL(req.url).searchParams;
+  const slug = cleanText(q.get("board") || "main", 36);
+  const { client, board, role } = await boardRole(slug, req.headers.get("x-clan-passcode") || "", req.headers.get("x-clan-admin-passcode") || "");
+  if (!client || !board || !role) return NextResponse.json({ members: [] });
+  const { data } = await client.from("member_post_counts").select("name,post_count,last_active,town_hall,bio").eq("board_slug", slug).order("post_count", { ascending: false });
+  return NextResponse.json({ members: data ?? [] });
+}
+
+export async function PATCH(req: NextRequest) {
+  const body = await req.json().catch(() => ({}));
+  const slug = cleanText(body.boardSlug || "main", 36);
+  const { client, board, role } = await boardRole(slug, typeof body.memberCode === "string" ? body.memberCode : "", typeof body.adminCode === "string" ? body.adminCode : "");
+  if (!client || !board || !role) return NextResponse.json({ error: "Join this clan board first." }, { status: 403 });
+  const name = cleanText(body.name, 24);
+  if (!name) return NextResponse.json({ error: "Choose a display name first." }, { status: 400 });
+  const townHall = Number(body.townHall);
+  const town_hall = townHall >= 1 && townHall <= 18 ? townHall : null;
+  const bio = cleanText(body.bio, 140);
+  const { error } = await client.from("members").upsert({ board_slug: slug, name, town_hall, bio, last_active: new Date().toISOString() }, { onConflict: "board_slug,name" });
+  if (error) return NextResponse.json({ error: "Could not save your profile." }, { status: 500 });
+  return NextResponse.json({ ok: true });
 }

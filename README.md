@@ -1,28 +1,21 @@
 # ClanLinks
 
-ClanLinks is a mobile-first sharing board for Clash of Clans base layouts, player links, and clan profiles. It uses Next.js App Router, TypeScript, Tailwind, and Supabase.
+ClanLinks is a mobile-first link board for Clash of Clans clans, built with Next.js App Router, TypeScript, Tailwind CSS, and Supabase.
 
-## Files
+## Features
 
-- `src/app` — App Router page, styles, and API routes
-- `src/components/clanlinks-app.tsx` — responsive feed, post modal, members view, and QR dialog
-- `src/lib` — link validation and Supabase client/types
-- `supabase/schema.sql` — database tables, indexes, view, and RLS policies
-- `.env.example` — deployment environment variables
+- Create multiple clan boards with separate member and administrator passcodes; share a board invite URL and give its member passcode to clanmates.
+- Share valid game links, tag a member, add notes and tags, and optionally auto-expire posts.
+- Search and filter by link type, Town Hall, and tags; sort by newest, likes, or ratings.
+- Like, bookmark, comment on, rate, copy, share, and open links with a QR code.
+- Member profiles, contributor rankings, mention/war notifications, reporting, pinning, hiding, restoring, and moderator review tools.
+- Per-board rate limits and duplicate-link checks. Display names are anonymous and user supplied.
 
-## Local setup
+## Setup
 
-1. Create a Supabase project and run `supabase/schema.sql` in its SQL Editor.
-2. Copy `.env.example` to `.env.local` and add the project URL, anon key, and service role key.
-3. Set `CLAN_PASSCODE` to a private passcode, or leave blank for a public board.
-4. Install packages with `npm install`.
-5. Start locally with `npm run dev` and open `http://localhost:3000`.
+1. Create a Supabase project and run `supabase/schema.sql` in its SQL Editor. On an already-running project, run the file as a migration; it preserves posts and assigns them to the `main` board.
+2. Set `SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` (or use the Vercel Supabase integration for deployment).
+3. Run `npm install`, then `npm run dev`, and open `http://localhost:3000`.
+4. Push `main` to GitHub; the connected Vercel project deploys each commit automatically.
 
-## Deploy to Vercel
-
-1. Import `dinesh6017l/clanlinks` at [vercel.com/new](https://vercel.com/new); Vercel detects Next.js automatically.
-2. Add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` in the Vercel project environment settings. Set `CLAN_PASSCODE` only if the board should require a passcode.
-3. Deploy. Vercel builds the Next.js app and runs its API routes; GitHub Pages only supports static sites and cannot host this app's API routes.
-4. New commits pushed to `main` deploy automatically after the GitHub repository is connected.
-
-Display names are stored in localStorage. The API validates links and text, deduplicates URLs, and applies the 5-post/10-minute limit per display name. Treat the optional passcode as a convenience gate, not identity verification: display names are anonymous and user supplied.
+Board passcodes are stored as salted hashes. The service role key must stay server-side and must never use a `NEXT_PUBLIC_` prefix.
