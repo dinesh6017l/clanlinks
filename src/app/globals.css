@@ -11,3 +11,8 @@
 .app-shell{background-image:repeating-linear-gradient(1deg,transparent 0 17px,rgba(218,174,112,.025) 18px,transparent 19px 36px),radial-gradient(ellipse at 48% 0%,#382016 0,#24150f 35%,#1b100d 73%)}
 .post-card{background-image:repeating-linear-gradient(1deg,transparent 0 8px,rgba(226,184,119,.025) 9px,transparent 10px 19px),linear-gradient(145deg,#352219,#2b1b14 70%)}
 .topbar{background-image:repeating-linear-gradient(1deg,transparent 0 12px,rgba(218,174,112,.018) 13px,transparent 14px 28px),linear-gradient(#1c110ee8,#1c110ee8)}
+/* Visible, low-contrast wood grain for the board surfaces. */
+.app-shell{background-image:repeating-linear-gradient(2deg,transparent 0 11px,rgba(218,174,112,.055) 12px,rgba(10,6,4,.11) 14px,transparent 15px 34px),repeating-linear-gradient(92deg,transparent 0 210px,rgba(0,0,0,.13) 211px,rgba(221,177,111,.035) 213px,transparent 215px 420px),radial-gradient(ellipse at 48% 0%,#382016 0,#24150f 35%,#1b100d 73%)}
+.post-card,.feature-page{background-image:repeating-linear-gradient(1deg,transparent 0 9px,rgba(226,184,119,.055) 10px,rgba(13,8,5,.10) 12px,transparent 13px 27px),linear-gradient(145deg,#352219,#2b1b14 70%)}
+.hero{background-image:repeating-linear-gradient(1deg,transparent 0 9px,rgba(226,184,119,.05) 10px,rgba(13,8,5,.09) 12px,transparent 13px 27px),radial-gradient(ellipse at 80% 45%,#614023 0,#432b1b 28%,#322016 63%,#2a1a13 100%)}
+.topbar{background-image:repeating-linear-gradient(1deg,transparent 0 10px,rgba(218,174,112,.04) 11px,rgba(5,3,2,.08) 13px,transparent 14px 29px),linear-gradient(#1c110ee8,#1c110ee8)}
