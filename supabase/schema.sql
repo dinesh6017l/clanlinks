@@ -15,7 +15,6 @@ create table if not exists public.posts (
 );
 create index if not exists posts_created_idx on public.posts (created_at desc) where hidden = false;
 create index if not exists posts_author_idx on public.posts (author);
-create index if not exists posts_search_idx on public.posts using gin (to_tsvector('simple', coalesce(author,'') || ' ' || coalesce(note,'') || ' ' || array_to_string(tags,' ')));
 
 create table if not exists public.members (
   name text primary key check (char_length(name) between 1 and 24),

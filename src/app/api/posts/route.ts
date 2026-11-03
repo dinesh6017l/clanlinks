@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { cleanText, detectLink } from "@/lib/detect-link";
-const db = () => process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY ? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY) : null;
+const db = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  return url && key ? createClient(url, key) : null;
+};
 export async function GET() { const client = db(); if (!client) return NextResponse.json({ posts: [] }); const { data, error } = await client.from("posts").select("*").eq("hidden", false).order("created_at", { ascending: false }).limit(100); if (error) return NextResponse.json({ error: "Could not load posts" }, { status: 500 }); return NextResponse.json({ posts: data }); }
 export async function POST(req: NextRequest) {
   const client = db(); if (!client) return NextResponse.json({ error: "Supabase is not configured yet." }, { status: 503 });
