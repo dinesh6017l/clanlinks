@@ -33,6 +33,8 @@ create table if not exists public.members (
   board_slug text not null default 'main' references public.boards(slug),
   town_hall smallint check (town_hall between 1 and 18),
   bio text not null default '' check (char_length(bio) <= 140),
+  player_tag text,
+  coc_verified_at timestamptz,
   last_active timestamptz not null default now()
 );
 alter table public.members drop constraint if exists members_pkey;
@@ -83,6 +85,8 @@ alter table public.posts add column if not exists expires_at timestamptz;
 alter table public.members add column if not exists board_slug text not null default 'main' references public.boards(slug);
 alter table public.members add column if not exists town_hall smallint check (town_hall between 1 and 18);
 alter table public.members add column if not exists bio text not null default '';
+alter table public.members add column if not exists player_tag text;
+alter table public.members add column if not exists coc_verified_at timestamptz;
 create index if not exists posts_board_created_idx on public.posts (board_slug, is_pinned desc, created_at desc) where hidden = false;
 
 create or replace function public.refresh_post_likes(target_post uuid)
@@ -94,9 +98,9 @@ grant execute on function public.refresh_post_likes(uuid) to service_role;
 
 drop view if exists public.member_post_counts;
 create view public.member_post_counts as
-select m.name, m.board_slug, m.town_hall, m.bio, count(p.id)::integer as post_count, m.last_active
+select m.name, m.board_slug, m.town_hall, m.bio, m.player_tag, m.coc_verified_at, count(p.id)::integer as post_count, m.last_active
 from members m left join posts p on lower(p.author) = lower(m.name) and p.board_slug = m.board_slug and p.hidden = false
-group by m.name, m.board_slug, m.town_hall, m.bio, m.last_active;
+group by m.name, m.board_slug, m.town_hall, m.bio, m.player_tag, m.coc_verified_at, m.last_active;
 
 alter table public.posts enable row level security;
 alter table public.likes enable row level security;

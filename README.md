@@ -15,6 +15,7 @@ ClanLinks is fan-made and is not affiliated with Supercell. It uses original int
 - Posts support an author display name, optional member mention, 140-character note, War/CWL/Farming/Trophy tags, and optional expiry after 1, 7, or 30 days.
 - Copy, QR/share, and open-in-game actions; likes, saved links, comments, and 1–5 star base ratings.
 - Member profiles include a Town Hall level and short bio. The Members page shows post counts and contributors.
+- Optional official Clash of Clans player checks match a player tag's in-game name and current clan against the configured clan tag. Matching profiles show a verification badge.
 - Reports include a reason. Three reports hide a post; board admins can review reports and pin, hide, restore, or delete posts. Expired posts can be relisted by an admin.
 - Clan boards have separate member and admin passcodes, board-specific posts and members, and invite URLs.
 - Mobile bottom navigation, a floating post action, action toasts, and animated cards and buttons.
@@ -65,8 +66,16 @@ The app can render without database configuration, but database-backed board and
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anon key; safe for browser use when RLS is configured. |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Server-only key used by API routes for validated database operations. Never expose it in client code or use a `NEXT_PUBLIC_` prefix. |
 | `CLAN_PASSCODE` | Optional | Optional legacy passcode gate for the `main` board. Most boards use their own member and admin passcodes. |
+| `COC_API_TOKEN` | Optional | Server-only official Clash of Clans API token used for profile checks. Never expose it in client code or use a `NEXT_PUBLIC_` prefix. |
+| `COC_CLAN_TAG` | Optional | Official clan tag that a player must currently belong to for a profile match. |
 
 Never commit `.env.local` or publish a service-role key. Configure production variables in Vercel under the project’s **Settings → Environment Variables**, then redeploy.
+
+### Official Clash of Clans profile checks
+
+Create an API key in the [Clash of Clans Developer Portal](https://developer.clashofclans.com/), then set `COC_API_TOKEN` and your official clan tag in Vercel. The Developer Portal restricts API keys by allowed IP address. Vercel Functions normally use changing outbound IPs, so API calls also require a stable Vercel Static IP configured for the project and added to the key's allowlist. Static IPs are available on Vercel Pro and Enterprise. See [Vercel's Static IP guide](https://vercel.com/kb/guide/can-i-get-a-fixed-ip-address).
+
+After the environment variables are configured and the latest `supabase/schema.sql` migration is applied, members can open **My profile**, enter their display name and player tag, and select **Verify game name and clan**. ClanLinks calls the official API from a server route, checks that the in-game name matches the display name and that the player's current clan tag matches `COC_CLAN_TAG`, then stores the match timestamp and player tag. This confirms the name and clan data returned by the API; because ClanLinks has no account login and the official API is read-only, it does not prove control of the game account.
 
 ## Database and access control
 
@@ -88,6 +97,7 @@ RLS allows anonymous reads for the public `main` board. Private board data and a
 | `POST /api/boards/[slug]/join` | Verify a member or admin passcode. |
 | `GET /api/boards/[slug]/moderation` | Load a board’s report queue and hidden posts for admins. |
 | `GET/PATCH /api/members` | List contributors or save a profile. |
+| `POST /api/verify-coc` | Match a player tag and display name to the configured clan through the official CoC API. |
 | `GET/POST /api/posts` | Load the board feed or create a post. |
 | `POST/DELETE /api/posts/[id]/like` | Add or remove a like. |
 | `POST/DELETE /api/posts/[id]/saved` | Save or unsave a post. |
