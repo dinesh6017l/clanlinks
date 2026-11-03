@@ -13,6 +13,7 @@ ClanLinks is fan-made and is not affiliated with Supercell. It uses original int
 - Feed ordered by pinned status and newest first, with a 15-second refresh, type filters, text search, Town Hall and tag filters, and sorting.
 - Link parsing accepts HTTPS URLs on `link.clashofclans.com` with supported actions: `OpenLayout`, `OpenPlayerProfile`, and `OpenClanProfile`. Layout IDs can provide a Town Hall level when they contain a `TH` or `TownHall` number.
 - Posts support an author display name, optional member mention, 140-character note, War/CWL/Farming/Trophy tags, and optional expiry after 1, 7, or 30 days.
+- Authors can edit their post note, mention, and tags or delete their post. Base-layout posts are exempt from the five-posts-per-10-minutes limit; duplicate links are still rejected.
 - Copy, QR/share, and open-in-game actions; likes, saved links, comments, and 1–5 star base ratings.
 - Member profiles include a Town Hall level and short bio. The Members page shows post counts and contributors.
 - Optional official Clash of Clans player checks match a player tag's in-game name and current clan against the configured clan tag. Matching profiles show a verification badge.

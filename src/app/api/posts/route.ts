@@ -45,9 +45,11 @@ export async function POST(req: NextRequest) {
   const note = cleanText(body.note, 140);
   const link = detectLink(body.url ?? "");
   if (!author || !link) return NextResponse.json({ error: "Add your name and a valid Clash of Clans link." }, { status: 400 });
-  const since = new Date(Date.now() - 10 * 60 * 1000).toISOString();
-  const { count } = await client.from("posts").select("id", { count: "exact", head: true }).eq("board_slug", slug).eq("author", author).gte("created_at", since);
-  if ((count ?? 0) >= 5) return NextResponse.json({ error: "Posting limit reached. Try again in a few minutes." }, { status: 429 });
+  if (link.type !== "Base") {
+    const since = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    const { count } = await client.from("posts").select("id", { count: "exact", head: true }).eq("board_slug", slug).eq("author", author).gte("created_at", since);
+    if ((count ?? 0) >= 5) return NextResponse.json({ error: "Posting limit reached. Try again in a few minutes." }, { status: 429 });
+  }
   const { data: existing } = await client.from("posts").select("id").eq("board_slug", slug).eq("url", link.url).maybeSingle();
   if (existing) return NextResponse.json({ error: "This link has already been shared." }, { status: 409 });
   const tags = Array.isArray(body.tags) ? body.tags.filter((tag: unknown) => ["War", "CWL", "Farming", "Trophy"].includes(String(tag))).slice(0, 4) : [];
